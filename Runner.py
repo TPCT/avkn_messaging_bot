@@ -1,4 +1,7 @@
+import time
 from threading import Thread
+from time import sleep
+
 from Core.Chatbot import Chatbot
 from Core.Account import Account
 from Core.PresenceSocket import PresenceSocket
@@ -11,13 +14,13 @@ openai_client = Chatbot(OPEN_AI_SECRET, OPEN_AI_MODEL_ID)
 
 def thread(token, proxy):
     account = Account(token, proxy, openai_client)
-    presence_socket = PresenceSocket(account)
-    messaging_socket = MessagingSocket(account, openai_client)
-    account.initialize()
-    presence_thread = Thread(target=presence_socket.keepalive, daemon=True)
+    account.start_presence_socket()
+    presence_thread = Thread(target=account.presence_socket.keepalive, daemon=True)
     presence_thread.start()
-    messaging_socket.init()
-    messaging_socket.listen()
+
+    account.start_messaging_socket()
+    messaging_thread = Thread(target=account.messaging_socket.listen, daemon=True)
+    messaging_thread.start()
 
 
 if __name__ == '__main__':

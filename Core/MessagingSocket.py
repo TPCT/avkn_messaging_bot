@@ -28,60 +28,60 @@ class MessagingSocket:
     def send(self, data):
         return self._socket.sendall((data.strip() + "\x00").encode('utf-8'))
 
-    def receive(self):
+    def receive(self, t=1):
         response = self._socket.recv(4096).decode('utf-8', errors='ignore')
-        sleep(1)
+        sleep(t)
         return response
 
     def _login_data(self):
-        self.receive()
         self.send(f'''
             <msg t='sys'><body action='login' r='0'><login z='Life'><nick><![CDATA[{self._client.x_avkn_userid}]]></nick><pword><![CDATA[{self._client.x_avkn_sfs_token}]]></pword><mduid><![CDATA[0282]]></mduid><comp><![CDATA[2]]></comp><version><![CDATA[2.005.00]]></version></login></body></msg>
         ''')
+        self.receive()
 
     def _room_list(self):
-        self.receive()
         self.send('''
-            <msg t='sys'><body action='getRmList' r='-1'></body></msg>
+        <msg t='sys'><body action='getRmList' r='-1'></body></msg>
         ''')
+        self.receive()
 
     def _zero_room(self):
-        self.receive()
         self.send('''
-            <msg t='sys'><body action='joinRoom' r='-1'><room id='1' pwd='' spec='0' leave='0' old='-1' /></body></msg>
+        <msg t='sys'><body action='joinRoom' r='-1'><room id='1' pwd='' spec='0' leave='0' old='-1' /></body></msg>
         ''')
+        self.receive()
 
     def _me(self):
-        self.receive()
         self.send('''
-            {"t":"xt","b":{"x":"me","p":{},"c":"bv","r":1}}
+        {"t":"xt","b":{"x":"me","p":{},"c":"bv","r":1}}
         ''')
+        self.receive()
 
     def _gold(self):
-        self.receive()
         self.send('''
-            {"t":"xt","b":{"x":"me","p":{"os_class":"Android","db":"Publish_Heart_Talk_White_Gold","platform":"GooglePlay","d":false,"os":"GooglePlay","si":{"graphicsDeviceVersion":"OpenGL ES 3.2 V@0502.0 (GIT@428fbbc7d8, I593c16c433, 1632727329) (Date:09/27/21)","supportsMultisampleResolveDepth":false,"graphicsDeviceVendor":"Qualcomm","supportsRenderTextures":true,"supportsTextureWrapMirrorOnce":0,"maxComputeWorkGroupSizeZ":64,"supportsGeometryShaders":true,"supportsMultiview":true,"maxComputeBufferInputsGeometry":4,"usesLoadStoreActions":true,"hasMipMaxLevel":true,"OSVersion":"11","supportsRenderToCubemap":true,"maxTextureArraySlices":2048,"processorType":"ARM64","supportsAudio":true,"batteryLevel":0.84,"maxComputeBufferInputsVertex":4,"maxComputeWorkGroupSize":1024,"supportsMultisampled2DArrayTextures":true,"graphicsDeviceID":0,"supportsSparseTextures":false,"maxCubemapSize":16384,"supportsAnisotropicFilter":true,"supportedRenderTargetCount":8,"hasHiddenSurfaceRemovalOnGPU":true,"supportsShadows":true,"maxTextureSize":16384,"supportsAccelerometer":true,"screenWidth":1554,"maxComputeBufferInputsCompute":24,"supportsStencil":1,"processorCount":8,"supports32bitsIndexBuffer":true,"graphicsDeviceType":"OpenGLES3","supportsStoreAndResolveAction":true,"supportsImageEffects":true,"supportsMultisampledTextures":1,"supports3DRenderTextures":true,"graphicsDeviceVendorID":0,"renderingThreadingMode":"MultiThreaded","npotSupport":"Full","supportsGyroscope":true,"supportsCubemapArrayTextures":true,"screenHeight":720,"minConstantBufferOffsetAlignment":false,"maxComputeWorkGroupSizeY":1024,"supportsRenderTargetArrayIndexFromVertexShader":false,"batteryStatus":"Charging","supportsAsyncCompute":false,"supportsVibration":true,"supportsComputeShaders":true,"supportsTessellationShaders":true,"supportsMultisampleAutoResolve":true,"supportsInstancing":true,"deviceModel":"vivo V2180A","supportsMotionVectors":true,"supportsRayTracing":false,"systemMemorySize":7654,"maxGraphicsBufferSize":2147483648,"supportsCompressed3DTextures":true,"androidAPILevel":30,"supportedRandomWriteTargetCount":20,"constantBufferOffsetAlignment":32,"operatingSystemFamily":"Other","supportsMipStreaming":true,"supports2DArrayTextures":true,"copyTextureSupport":"RTToTexture, TextureToRT, DifferentTypes, Copy3D, Basic","graphicsPixelFillrate":-1,"maxComputeBufferInputsHull":4,"maxAnisotropyLevel":16,"supportsConservativeRaster":false,"operatingSystem":"Android OS 11 / API-30 (RP1A.200720.012/eng.compil.20220715.233728)","supportsAsyncGPUReadback":true,"supportsSetConstantBuffer":true,"graphicsMultiThreaded":true,"supportsGpuRecorder":false,"graphicsUVStartsAtTop":false,"supportsGPUFence":false,"androidOSVersion":"11","graphicsDeviceName":"Adreno (TM) 610","supportsVertexPrograms":true,"computeSubGroupSize":1,"deviceType":"Handheld","supportsLocationService":true,"graphicsShaderLevel":50,"supportsRawShadowDepthSampling":true,"maxTexture3DSize":2048,"graphicsMemorySize":2048,"hasDynamicUniformArrayIndexingInFragmentShaders":true,"hdrDisplaySupportFlags":"None","processorFrequency":4800,"supports3DTextures":true,"supportsHardwareQuadTopology":false,"maxComputeWorkGroupSizeX":1024,"usesReversedZBuffer":false,"maxComputeBufferInputsDomain":4,"supportsSeparatedRenderTargetsBlend":true,"maxComputeBufferInputsFragment":4,"supportsGraphicsFence":true},"cl":["en"],"lvs":{"GpuMemory":"VeryHigh","GpuLevel":"VeryHigh","TotalMemory":"VeryHigh","CpuMemory":"VeryHigh","IsUltraHigh":true,"AverageLevel":"VeryHigh"},"ft":{"avakin-interactions":3,"emojis":2,"shop":1,"homebrew":40,"more-avakins":1,"int-gift":2,"lkwd-bundle-format":1,"furniture-format":2,"avatar-actions":3,"lobby":3,"avatar_contour":1,"chat-reactions":1,"node-chat":1,"node-hashing":2,"jwt-avakin":1,"shader":1,"avatar_bodymorph":1,"badges":1,"netactor":101},"p":"Android","dl":"English","v":"1.095.00","vr":false,"i":false,"l":"en-US","m":false,"b":true},"c":"pld","r":1}}
+        {"t":"xt","b":{"x":"me","p":{"os_class":"Android","db":"Publish_Heart_Talk_White_Gold","platform":"GooglePlay","d":false,"os":"GooglePlay","si":{"graphicsDeviceVersion":"OpenGL ES 3.2 V@0502.0 (GIT@428fbbc7d8, I593c16c433, 1632727329) (Date:09/27/21)","supportsMultisampleResolveDepth":false,"graphicsDeviceVendor":"Qualcomm","supportsRenderTextures":true,"supportsTextureWrapMirrorOnce":0,"maxComputeWorkGroupSizeZ":64,"supportsGeometryShaders":true,"supportsMultiview":true,"maxComputeBufferInputsGeometry":4,"usesLoadStoreActions":true,"hasMipMaxLevel":true,"OSVersion":"11","supportsRenderToCubemap":true,"maxTextureArraySlices":2048,"processorType":"ARM64","supportsAudio":true,"batteryLevel":0.84,"maxComputeBufferInputsVertex":4,"maxComputeWorkGroupSize":1024,"supportsMultisampled2DArrayTextures":true,"graphicsDeviceID":0,"supportsSparseTextures":false,"maxCubemapSize":16384,"supportsAnisotropicFilter":true,"supportedRenderTargetCount":8,"hasHiddenSurfaceRemovalOnGPU":true,"supportsShadows":true,"maxTextureSize":16384,"supportsAccelerometer":true,"screenWidth":1554,"maxComputeBufferInputsCompute":24,"supportsStencil":1,"processorCount":8,"supports32bitsIndexBuffer":true,"graphicsDeviceType":"OpenGLES3","supportsStoreAndResolveAction":true,"supportsImageEffects":true,"supportsMultisampledTextures":1,"supports3DRenderTextures":true,"graphicsDeviceVendorID":0,"renderingThreadingMode":"MultiThreaded","npotSupport":"Full","supportsGyroscope":true,"supportsCubemapArrayTextures":true,"screenHeight":720,"minConstantBufferOffsetAlignment":false,"maxComputeWorkGroupSizeY":1024,"supportsRenderTargetArrayIndexFromVertexShader":false,"batteryStatus":"Charging","supportsAsyncCompute":false,"supportsVibration":true,"supportsComputeShaders":true,"supportsTessellationShaders":true,"supportsMultisampleAutoResolve":true,"supportsInstancing":true,"deviceModel":"vivo V2180A","supportsMotionVectors":true,"supportsRayTracing":false,"systemMemorySize":7654,"maxGraphicsBufferSize":2147483648,"supportsCompressed3DTextures":true,"androidAPILevel":30,"supportedRandomWriteTargetCount":20,"constantBufferOffsetAlignment":32,"operatingSystemFamily":"Other","supportsMipStreaming":true,"supports2DArrayTextures":true,"copyTextureSupport":"RTToTexture, TextureToRT, DifferentTypes, Copy3D, Basic","graphicsPixelFillrate":-1,"maxComputeBufferInputsHull":4,"maxAnisotropyLevel":16,"supportsConservativeRaster":false,"operatingSystem":"Android OS 11 / API-30 (RP1A.200720.012/eng.compil.20220715.233728)","supportsAsyncGPUReadback":true,"supportsSetConstantBuffer":true,"graphicsMultiThreaded":true,"supportsGpuRecorder":false,"graphicsUVStartsAtTop":false,"supportsGPUFence":false,"androidOSVersion":"11","graphicsDeviceName":"Adreno (TM) 610","supportsVertexPrograms":true,"computeSubGroupSize":1,"deviceType":"Handheld","supportsLocationService":true,"graphicsShaderLevel":50,"supportsRawShadowDepthSampling":true,"maxTexture3DSize":2048,"graphicsMemorySize":2048,"hasDynamicUniformArrayIndexingInFragmentShaders":true,"hdrDisplaySupportFlags":"None","processorFrequency":4800,"supports3DTextures":true,"supportsHardwareQuadTopology":false,"maxComputeWorkGroupSizeX":1024,"usesReversedZBuffer":false,"maxComputeBufferInputsDomain":4,"supportsSeparatedRenderTargetsBlend":true,"maxComputeBufferInputsFragment":4,"supportsGraphicsFence":true},"cl":["en"],"lvs":{"GpuMemory":"VeryHigh","GpuLevel":"VeryHigh","TotalMemory":"VeryHigh","CpuMemory":"VeryHigh","IsUltraHigh":true,"AverageLevel":"VeryHigh"},"ft":{"avakin-interactions":3,"emojis":2,"shop":1,"homebrew":40,"more-avakins":1,"int-gift":2,"lkwd-bundle-format":1,"furniture-format":2,"avatar-actions":3,"lobby":3,"avatar_contour":1,"chat-reactions":1,"node-chat":1,"node-hashing":2,"jwt-avakin":1,"shader":1,"avatar_bodymorph":1,"badges":1,"netactor":101},"p":"Android","dl":"English","v":"1.095.00","vr":false,"i":false,"l":"en-US","m":false,"b":true},"c":"pld","r":1}}
         ''')
+        self.receive()
 
     def _room_zero(self):
         for i in range(2):
-            self.receive()
             self.send('''
-                {"t":"xt","b":{"x":"me","p":{"d":false,"fl":null,"o":0,"f":["1056102068"],"l":-1},"c":"rl","r":1}}
+            {"t":"xt","b":{"x":"me","p":{"d":false,"fl":null,"o":0,"f":["1056102068"],"l":-1},"c":"rl","r":1}}
             ''')
+            self.receive()
 
     def _room(self):
-        self.receive()
         self.send('''
             {"t":"xt","b":{"x":"me","p":{"d":false,"ri":0,"id":29939333,"f":null},"c":"rr","r":1}}
         ''')
+        sleep(1)
 
     def _get_room_id(self):
         while True:
             content = self.receive().replace("\\", "").strip()
             self._room_id = re.search(r"<rm id='(\d+)'", content)
             if self._room_id:
-                self._room_id = self._room_id.group(1)
+                self._room_id = int(self._room_id.group(1))
                 break
 
     def _big(self):
@@ -105,8 +105,10 @@ class MessagingSocket:
                                                                  "appleMusic_collection_name": None,
                                                                  "lock_interactions": False}}, "c": "ua",
                                           "r": self._room_id}}))
+        sleep(1)
 
     def init(self):
+        self.receive(t=0)
         self._login_data()
         self._room_list()
         self._zero_room()
@@ -132,7 +134,7 @@ class MessagingSocket:
         raw=f'''{{"n":"{self._client.x_avkn_username}","m":"{message}","h":-1,"c":-1,"cg":"","o":[-7.35,0.03,1.98],"r":[0,180,0]}}'''
         b64 = b64encode(raw.encode('utf-8'))
         b64=b64.decode('utf-8')
-        message=f"<msg t='sys'><body action='pubMsg' r='{int(self._room_id)}'><txt><![CDATA[{b64}]]></txt></body></msg>"
+        message=f"<msg t='sys'><body action='pubMsg' r='{self._room_id}'><txt><![CDATA[{b64}]]></txt></body></msg>"
         return message
 
     def listen(self):
@@ -143,10 +145,12 @@ class MessagingSocket:
                 message = re.findall(r"action='pubMsg'.*\[CDATA\[(.*)]]", content)
                 if message:
                     message = loads(urlsafe_b64decode(message[0] + "==").decode('utf-8'))
+                    if message['n'] == self._client.x_avkn_username:
+                        continue
                     print(f"[{message['n']}]: {message['m']}")
                     response = self._openai_client.response(message['m'])
                     print(f"[{self._client.x_avkn_username}:{self._client.x_avkn_userid}]: {response}")
-                    self.send(response)
+                    self.send(self.encrypt_message(f"[{message['n']}], {response}"))
             except Exception as e:
                 ...
 

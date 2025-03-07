@@ -1,6 +1,9 @@
 from warnings import filterwarnings
 from requests import Session
 from json import loads
+
+from Core.MessagingSocket import MessagingSocket
+from Core.PresenceSocket import PresenceSocket
 from Core.Utils import Utils
 from threading import Thread
 
@@ -20,8 +23,8 @@ class Account:
     def __init__(self, token, proxy=None, openai_client=None):
         self._token = token
         self._account_info = {}
-        self._outfits = []
-        self._body = []
+        self._outfit = None
+        self._body = None
         self._friends = []
         self._logged = False
         self._session = Session()
@@ -30,8 +33,8 @@ class Account:
             'http': proxy,
             'https': proxy,
         } if proxy else None
-        self._messaging_socket = None
-        self._presence_socket = None
+        self._messaging_socket = MessagingSocket(self, self._openai_client)
+        self._presence_socket = PresenceSocket(self)
 
     def __getattr__(self, name):
         if name.startswith('x_avkn'):
@@ -47,10 +50,11 @@ class Account:
         kwargs['verify'] = False
         if url.startswith('https://api-sni.avkn.co'):
             kwargs['proxies'] = self._proxy
+
         response = self._session.request(method, url, **kwargs)
         for key, value in response.headers.items():
             key = key.replace('-', '_').lower()
-            if key.lower().startswith('x_avkn') and key not in self._account_info:
+            if key.lower().startswith('x_avkn'):
                 self._account_info[key] = value
 
         if response.headers['content-type'] == 'application/json':
@@ -61,6 +65,8 @@ class Account:
         return response
 
     def login(self):
+        if self._logged:
+            return
         headers = self.request('GET', self.JTAG_API + "/start-chat",
                                headers={'api-key': self.JTAG_API_SECRET}).json()
         response = self.request('POST', self.AVKN_API_LOGIN, headers=headers, json={
@@ -72,7 +78,7 @@ class Account:
         if response.status_code != 200:
             raise Exception("Login failed")
 
-        self.x_avkn_userid = response.json().get('user_id')
+        self.x_avkn_userid = int(response.json().get('user_id'))
         if not all([self.x_avkn_chat_tag, self.x_avkn_jwtsession, self.x_avkn_session]):
             raise ValueError("Missing Required Response Data")
 
@@ -108,7 +114,7 @@ class Account:
         response = self.request('POST', self.AVKN_API_GET_BODY, json={
             'type': 'outfit'
         })
-        self._outfits = list(response.json()['objects'][0].values())[0]
+        self._outfit = list(response.json()['objects'][0].values())[0]
 
     def get_body(self):
         if not self._logged:
@@ -138,7 +144,7 @@ class Account:
         self.x_avkn_sfs_token = response.json()['signature']
         data = loads(Utils.base64_decode(self.x_avkn_sfs_token.split('.')[1]))
         self.x_avkn_username = data['username']
-        self.x_avkn_xp = data['xp']
+        self.x_avkn_xp = int(data['xp']['xp'])
 
     @property
     def body(self):
@@ -152,12 +158,17 @@ class Account:
     def friends(self):
         return self._friends
 
-    def initialize(self):
+    def start_presence_socket(self):
+        self.login()
+        self.get_friends()
+        self._presence_socket.init()
+
+    def start_messaging_socket(self):
         self.login()
         self.get_body()
         self.get_outfit()
-        self.get_friends()
         self.sfs_refresh()
+        self._messaging_socket.init()
 
     @property
     def presence_socket(self):
