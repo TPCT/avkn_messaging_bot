@@ -8,15 +8,18 @@ OPEN_AI_SECRET = 'sk-proj-W6w9c8nK_dTAL9rqGsZU0ZFEziYJ4RqJ8Umkue3vG0huCNPEtMl9QF
 OPEN_AI_MODEL_ID = 'ft:gpt-3.5-turbo-0125:personal::B7issDw8'
 openai_client = Chatbot(OPEN_AI_SECRET, OPEN_AI_MODEL_ID)
 
+excludes = []
 
-def thread(token, proxy):
-    account = Account(token, proxy, openai_client)
-    account.start_presence_socket()
-    presence_thread = Thread(target=account.presence_socket.keepalive, daemon=True)
+def thread(_token, proxy):
+    _account = Account(_token, proxy, openai_client)
+    _account.start_presence_socket()
+    presence_thread = Thread(target=_account.presence_socket.keepalive, daemon=True)
     presence_thread.start()
 
-    account.start_messaging_socket()
-    messaging_thread = Thread(target=account.messaging_socket.listen, daemon=True)
+    _account.start_messaging_socket()
+    excludes.append(_account.x_avkn_username)
+    _account.messaging_socket.set_exclude(excludes)
+    messaging_thread = Thread(target=_account.messaging_socket.listen, daemon=True)
     messaging_thread.start()
 
 

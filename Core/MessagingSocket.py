@@ -14,6 +14,7 @@ class MessagingSocket:
 
     def __init__(self, client, openai_client):
         self._client = client
+        self._exclude = []
         self._openai_client = openai_client
         socket.socket = socks.socksocket
         raw_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -32,6 +33,9 @@ class MessagingSocket:
         response = self._socket.recv(4096).decode('utf-8', errors='ignore')
         sleep(t)
         return response
+
+    def set_exclude(self, exclude):
+        self._exclude = exclude
 
     def _login_data(self):
         self.send(f'''
@@ -145,10 +149,10 @@ class MessagingSocket:
                 message = re.findall(r"action='pubMsg'.*\[CDATA\[(.*)]]", content)
                 if message:
                     message = loads(urlsafe_b64decode(message[0] + "==").decode('utf-8'))
-                    if message['n'] == self._client.x_avkn_username:
+                    if message['n'] in self._exclude:
                         continue
                     print(f"[{message['n']}]: {message['m']}")
-                    response = self._openai_client.response(message['m'])
+                    response = self._openai_client.response(message['n'], message['m'])
                     print(f"[{self._client.x_avkn_username}:{self._client.x_avkn_userid}]: {response}")
                     self.send(self.encrypt_message(f"[{message['n']}], {response}"))
             except Exception as e:
