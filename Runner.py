@@ -27,14 +27,14 @@ if __name__ == '__main__':
     proxies = []
     tokens = []
 
-    with open('proxies', 'r') as f:
+    with open('proxies', 'r', encoding='utf-8', errors='ignore') as f:
         for line in f:
             if not line.strip():
                 continue
             proxies.append(line.strip())
 
 
-    with open('tokens', 'r') as f:
+    with open('tokens', 'r', encoding='utf-8', errors='ignore') as f:
         for line in f:
             if not line.strip():
                 continue
