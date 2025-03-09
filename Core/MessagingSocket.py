@@ -149,7 +149,7 @@ class MessagingSocket:
                 message = re.findall(r"action='pubMsg'.*\[CDATA\[(.*)]]", content)
                 if message:
                     message = loads(urlsafe_b64decode(message[0] + "==").decode('utf-8'))
-                    if message['n'] in self._exclude:
+                    if message['n'].strip() == self._client.x_avkn_username:
                         continue
                     print(f"[{message['n']}]: {message['m']}")
                     response = self._openai_client.response(message['n'], message['m'])

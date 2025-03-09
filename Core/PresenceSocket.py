@@ -15,10 +15,14 @@ class PresenceSocket:
         socket.socket = socks.socksocket
         self._presence_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._presence_socket.connect((self.HOST, self.PORT))
+        self._killed = False
 
     def send(self, data):
         data = (data.strip() + '\x1a').encode('utf-8')
         self._presence_socket.sendall(data)
+
+    def kill(self):
+        self._killed = True
 
     def init(self):
         ...
@@ -28,7 +32,7 @@ class PresenceSocket:
             {"msg":"register","data":{"ID":self._client.x_avkn_userid,"version":"v1.1","token":self._client.x_avkn_session,"friends":self._client.friends}}, separators=(',', ':'))
         )
         sleep(20)
-        while True:
+        while not self._killed:
             self.send('''{"msg":"keepAlive","data":""}''')
             sleep(20)
 

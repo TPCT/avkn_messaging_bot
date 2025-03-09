@@ -17,10 +17,16 @@ def thread(_token, proxy):
     presence_thread.start()
 
     _account.start_messaging_socket()
-    excludes.append(_account.x_avkn_username)
+    if _account.messaging_socket.room_id in excludes:
+        _account.presence_socket.kill()
+        presence_thread.join()
+        return thread(_token, proxy)
+
+    excludes.append(_account.messaging_socket.room_id)
     _account.messaging_socket.set_exclude(excludes)
     messaging_thread = Thread(target=_account.messaging_socket.listen, daemon=True)
     messaging_thread.start()
+
 
 
 if __name__ == '__main__':
