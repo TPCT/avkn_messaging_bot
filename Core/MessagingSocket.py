@@ -160,4 +160,4 @@ class MessagingSocket:
 
     @property
     def room_id(self):
-        return self.room_id
+        return self._room_id

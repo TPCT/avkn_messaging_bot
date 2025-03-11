@@ -1,7 +1,7 @@
 from warnings import filterwarnings
 from requests import Session
 from json import loads
-
+import jwt
 from Core.MessagingSocket import MessagingSocket
 from Core.PresenceSocket import PresenceSocket
 from Core.Utils import Utils
@@ -142,9 +142,10 @@ class Account:
             raise Exception("Login First To Fetch Sfs Token Refresh")
         response = self.request('POST', self.AVKN_API_SESSION_TOKEN_REFRESH, data='null')
         self.x_avkn_sfs_token = response.json()['signature']
-        data = loads(Utils.base64_decode(self.x_avkn_sfs_token.split('.')[1]))
+        data = jwt.decode(self.x_avkn_sfs_token, options={"verify_signature": False})
         self.x_avkn_username = data['username']
         self.x_avkn_xp = int(data['xp']['xp'])
+
 
     @property
     def body(self):
