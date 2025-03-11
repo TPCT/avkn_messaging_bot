@@ -47,6 +47,9 @@ if __name__ == '__main__':
             tokens.append(line.strip())
 
     for i, token in enumerate(tokens):
-        thread(token, proxies[i % len(proxies)] if proxies else None)
+       try:
+           thread(token, proxies[i % len(proxies)] if proxies else None)
+       except Exception as e:
+           print(e)
 
     input()

@@ -76,15 +76,11 @@ class Account:
             }
         })
         if response.status_code != 200:
-            print("Login failed")
-            self._logged = False
-            return None
+            raise Exception("Login failed")
 
         self.x_avkn_userid = int(response.json().get('user_id'))
         if not all([self.x_avkn_chat_tag, self.x_avkn_jwtsession, self.x_avkn_session]):
-            print("Missing Required Response Data")
-            self._logged = False
-            return None
+            raise ValueError("Missing Required Response Data")
 
         response = self.request('POST', self.JTAG_API + "/journey-seq",
                                 headers={
@@ -114,9 +110,7 @@ class Account:
 
     def get_outfit(self):
         if not self._logged:
-            print("Login First To Fetch Outfit")
-            return
-
+            raise Exception("Login First To Fetch Outfit")
         response = self.request('POST', self.AVKN_API_GET_BODY, json={
             'type': 'outfit'
         })
@@ -124,8 +118,7 @@ class Account:
 
     def get_body(self):
         if not self._logged:
-            print("Login First To Fetch Body")
-            return
+            raise Exception("Login First To Fetch Body")
 
         response = self.request('POST', self.AVKN_API_GET_BODY, json={
             'type': 'avakinbody'
@@ -134,21 +127,19 @@ class Account:
 
     def get_friends(self):
         if not self._logged:
-            print("Login First To Fetch Friends")
-            return
+            raise Exception("Login First To Fetch Friends")
         response = self.request('POST', self.AVKN_API_GET_FRIENDS, json={
             'check_limits': True
         })
         if response.status_code == 200:
-            response = response.json().get('relation', [])
+            response = response.json().get('relation' , [])
             for data in response:
                 if data['status'] == 'friend':
                     self._friends.append(data['buddy_id'])
 
     def sfs_refresh(self):
         if not self._logged:
-            print("Login First To Fetch Sfs Token Refresh")
-            return
+            raise Exception("Login First To Fetch Sfs Token Refresh")
         response = self.request('POST', self.AVKN_API_SESSION_TOKEN_REFRESH, data='null')
         self.x_avkn_sfs_token = response.json()['signature']
         data = jwt.decode(self.x_avkn_sfs_token, options={"verify_signature": False})
