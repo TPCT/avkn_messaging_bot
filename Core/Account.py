@@ -76,11 +76,15 @@ class Account:
             }
         })
         if response.status_code != 200:
-            raise Exception("Login failed")
+            print("Login failed")
+            self._logged = False
+            return None
 
         self.x_avkn_userid = int(response.json().get('user_id'))
         if not all([self.x_avkn_chat_tag, self.x_avkn_jwtsession, self.x_avkn_session]):
-            raise ValueError("Missing Required Response Data")
+            print("Missing Required Response Data")
+            self._logged = False
+            return None
 
         response = self.request('POST', self.JTAG_API + "/journey-seq",
                                 headers={
@@ -127,19 +131,21 @@ class Account:
 
     def get_friends(self):
         if not self._logged:
-            raise Exception("Login First To Fetch Friends")
+            print("Login First To Fetch Friends")
+            return
         response = self.request('POST', self.AVKN_API_GET_FRIENDS, json={
             'check_limits': True
         })
         if response.status_code == 200:
-            response = response.json()['relation']
+            response = response.json().get('relation', [])
             for data in response:
                 if data['status'] == 'friend':
                     self._friends.append(data['buddy_id'])
 
     def sfs_refresh(self):
         if not self._logged:
-            raise Exception("Login First To Fetch Sfs Token Refresh")
+            print("Login First To Fetch Sfs Token Refresh")
+            return
         response = self.request('POST', self.AVKN_API_SESSION_TOKEN_REFRESH, data='null')
         self.x_avkn_sfs_token = response.json()['signature']
         data = jwt.decode(self.x_avkn_sfs_token, options={"verify_signature": False})
