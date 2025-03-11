@@ -114,7 +114,9 @@ class Account:
 
     def get_outfit(self):
         if not self._logged:
-            raise Exception("Login First To Fetch Outfit")
+            print("Login First To Fetch Outfit")
+            return
+
         response = self.request('POST', self.AVKN_API_GET_BODY, json={
             'type': 'outfit'
         })
@@ -122,7 +124,8 @@ class Account:
 
     def get_body(self):
         if not self._logged:
-            raise Exception("Login First To Fetch Body")
+            print("Login First To Fetch Body")
+            return
 
         response = self.request('POST', self.AVKN_API_GET_BODY, json={
             'type': 'avakinbody'
